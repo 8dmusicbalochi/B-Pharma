@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -16,11 +15,11 @@ const Login: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const user = await login(email, password);
-      if (user) {
-        navigate('/dashboard');
+      const { error: authError } = await login(email, password);
+      if (authError) {
+        setError(authError.message || 'Invalid credentials. Please try again.');
       } else {
-        setError('Invalid credentials. Please try again.');
+        navigate('/dashboard');
       }
     } catch (err) {
       setError('An error occurred during login.');
@@ -38,13 +37,8 @@ const Login: React.FC = () => {
         </div>
 
         <div className="bg-blue-50 border border-blue-200 text-blue-800 text-sm rounded-lg p-3">
-            <p><strong>Demo Accounts:</strong></p>
-            <ul className="list-disc list-inside mt-1">
-                <li>cashier@bpharma.com</li>
-                <li>stock@bpharma.com</li>
-                <li>admin@bpharma.com</li>
-            </ul>
-            <p className="mt-1">Any password will work.</p>
+            <p><strong>Demo Account:</strong></p>
+            <p className="mt-1">Use <strong>cashier@bpharma.com</strong> with the password <strong>password</strong> to log in. Other accounts may be available in the Supabase backend.</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
