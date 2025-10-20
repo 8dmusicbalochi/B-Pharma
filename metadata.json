@@ -1,0 +1,5 @@
+{
+  "name": "B-Pharma POS",
+  "description": "B-Pharma POS is a comprehensive Progressive Web App (PWA) designed specifically for pharmacy management operations, integrating Point of Sale, inventory management, financial tracking, and administrative controls.",
+  "requestFramePermissions": []
+}
