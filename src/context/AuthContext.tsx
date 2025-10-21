@@ -17,33 +17,48 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        if (session && session.user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-            
-          if (profile) {
+        try {
+          if (session?.user) {
+            const { data: profile, error } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+
+            if (error) {
+              console.error("Error fetching profile, signing out:", error);
+              await supabase.auth.signOut();
+              setUser(null);
+            } else if (profile) {
               setUser({
-                  id: session.user.id,
-                  name: profile.full_name,
-                  email: session.user.email!,
-                  role: profile.role as UserRole,
-                  avatarUrl: profile.avatar_url,
+                id: session.user.id,
+                name: profile.full_name,
+                email: session.user.email!,
+                role: profile.role as UserRole,
+                avatarUrl: profile.avatar_url,
               });
+            } else {
+              console.error("Profile not found for authenticated user, signing out.");
+              await supabase.auth.signOut();
+              setUser(null);
+            }
+          } else {
+            setUser(null);
           }
-        } else {
-          setUser(null);
+        } catch (err) {
+            console.error("Caught error in auth state change handler:", err);
+            setUser(null);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
       }
     );
 
     return () => {
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, []);
 
